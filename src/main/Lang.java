@@ -1,6 +1,6 @@
 package main;
 
-public class L {
+public class Lang {
 	
 	public static final String backButton = "Back";
 	public static final String closeButton = "Close";

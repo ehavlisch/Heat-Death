@@ -25,106 +25,118 @@ import items.*;
 import options.Option;
 
 public class HeatDeath {
-	
+
 	protected Location current;
 	protected Player player;
 	protected int worldSize;
 	protected int worldDensity;
 	protected World world;
 	protected Sector sector;
-	
+
 	protected boolean debug;
-	
+
 	protected GameFileManager fileManager;
 
-	//	   1.change arrayLists for connecting locations, options, and interiors to maps to make lookups faster
-	//	   2.add a global id generation function in randomizer to assign each location, option a unique id
-	//     3.use the unique id to lookup things from the maps more quickly than iterating through each array list
-	// 	Is this necessary any more? The list or map would be traversed to display all possible options
-	//	at a given location, using the locationButton and optionButton should replace the need for this.
-	
-	
-	//TODO add saving - in progress
+	// 1.change arrayLists for connecting locations, options, and interiors to
+	// maps to make lookups faster
+	// 2.add a global id generation function in randomizer to assign each
+	// location, option a unique id
+	// 3.use the unique id to lookup things from the maps more quickly than
+	// iterating through each array list
+	// Is this necessary any more? The list or map would be traversed to display
+	// all possible options
+	// at a given location, using the locationButton and optionButton should
+	// replace the need for this.
+
+	// TODO add saving - in progress
 	// Still need to add:
-	//		Player saving
-	//		Listing saved games
-	//		Loading save game
-	
-	//TODO graphical UI - in progress
-	// 	Functional option buttons
-	// 	Functional wormholes
-	//	Functional ship management
-	//	Remove panel generation from HeatDeathUI to make the class less massive
-	
-	//TODO change the way worlds are generated so the whole world isn't always in memory.'
-	// ideas: add a global seed that the world generation is based on. This will allow the same world to be generated from
-	//        the existing nodes (that may have player interaction) and the seed even after exiting.
-	//        this could make daily challenges like spelunky possible
-	// idea 2: instead of generating all the locations at startup, add a probability of a location occurring and just dynamically generate the world
-	//        this would mean no two worlds could be the same, no daily challenges like spelunky
-	// idea 3: generate sectors that are mini worlds - small enough to reside in memory. When the player changes sectors, save down one sector to hd.
-	// 		   then we can load the new sector into memory. Changing sectors might be expensive, but we can keep less world in memory at one time.
-	//			we can randomly add wormholes to other sectors depending on the number of locations visited without a connection to another sector
-	//			world size can explicitly be the number of sectors generated. World density can be the number of wormholes in each sector
-	//			the initial world generation might get bad
-	// 			the world can consist of a map<SectorName, List<String> locations> and whatever sector the player is currently in
-		
-	//TODO depreciate command line functions from HeatDeath 
-	//TODO depreciate all command line IO functions in IOHandler
-	
-	//TODO Change how we load the localization strings to allow the user to change languages
-	
+	// Player saving
+	// Listing saved games
+	// Loading save game
+
+	// TODO graphical UI - in progress
+	// Functional option buttons
+	// Functional wormholes
+	// Functional ship management
+	// Remove panel generation from HeatDeathUI to make the class less massive
+
+	// TODO change the way worlds are generated so the whole world isn't always
+	// in memory.'
+	// ideas: add a global seed that the world generation is based on. This will
+	// allow the same world to be generated from
+	// the existing nodes (that may have player interaction) and the seed even
+	// after exiting.
+	// this could make daily challenges like spelunky possible
+	// idea 2: instead of generating all the locations at startup, add a
+	// probability of a location occurring and just dynamically generate the
+	// world
+	// this would mean no two worlds could be the same, no daily challenges like
+	// spelunky
+	// idea 3: generate sectors that are mini worlds - small enough to reside in
+	// memory. When the player changes sectors, save down one sector to hd.
+	// then we can load the new sector into memory. Changing sectors might be
+	// expensive, but we can keep less world in memory at one time.
+	// we can randomly add wormholes to other sectors depending on the number of
+	// locations visited without a connection to another sector
+	// world size can explicitly be the number of sectors generated. World
+	// density can be the number of wormholes in each sector
+	// the initial world generation might get bad
+	// the world can consist of a map<SectorName, List<String> locations> and
+	// whatever sector the player is currently in
+
+	// TODO depreciate command line functions from HeatDeath
+	// TODO depreciate all command line IO functions in IOHandler
+
+	// TODO Change how we load the localization strings to allow the user to
+	// change languages
+
 	public static void main(String[] args) {
-				
+
 		HeatDeath heatDeath = new HeatDeath();
 		heatDeath.newGameQuick();
-		//heatDeath.newGame();
+		// heatDeath.newGame();
 		heatDeath.runGame();
 
 	}
-	
+
 	public void runGame() {
-		
+
 		// Test Combat
 		/*
-		Combat c = new Combat(current);
-		player.ship.applyUpgrade(new WeaponLaserSm(), new ShipUpdateResult());
-		player.ship.applyUpgrade(new WeaponLaserSm(), new ShipUpdateResult());
-		player.ship.applyUpgrade(new WeaponLaserSm(), new ShipUpdateResult());
-		player.ship.applyUpgrade(new WeaponLaserSm(), new ShipUpdateResult());
+		 * Combat c = new Combat(current); player.ship.applyUpgrade(new
+		 * WeaponLaserSm(), new ShipUpdateResult());
+		 * player.ship.applyUpgrade(new WeaponLaserSm(), new
+		 * ShipUpdateResult()); player.ship.applyUpgrade(new WeaponLaserSm(),
+		 * new ShipUpdateResult()); player.ship.applyUpgrade(new
+		 * WeaponLaserSm(), new ShipUpdateResult());
+		 * 
+		 * ArrayList<SuperAI> ais = new ArrayList<SuperAI>(2);
+		 * 
+		 * 
+		 * Ship shipOne = new ShipEagle("Pirate Vessel 'Eagle'");
+		 * shipOne.applyUpgrade(new WeaponLaserSm(), new ShipUpdateResult());
+		 * 
+		 * ais.add(new AgressiveAI(shipOne));
+		 * 
+		 * Ship shipTwo = new ShipSwordfish("Pirate Vessel 'Swordfish'");
+		 * shipTwo.applyUpgrade(new WeaponLaserSm(), new ShipUpdateResult());
+		 * 
+		 * ais.add(new AgressiveAI(shipTwo));
+		 * 
+		 * c.initializeCombat(ais, player);
+		 * 
+		 * CombatUpdate cu = c.run(); current = cu.getRetreatLocation();
+		 * player.update(cu.getPu()); player.ship.update(cu.getSu());
+		 * 
+		 * System.exit(1);
+		 */
 
-		ArrayList<SuperAI> ais = new ArrayList<SuperAI>(2);
-		
-		
-		Ship shipOne = new ShipEagle("Pirate Vessel 'Eagle'");
-		shipOne.applyUpgrade(new WeaponLaserSm(), new ShipUpdateResult());
-
-		ais.add(new AgressiveAI(shipOne));
-		
-		Ship shipTwo = new ShipSwordfish("Pirate Vessel 'Swordfish'");
-		shipTwo.applyUpgrade(new WeaponLaserSm(), new ShipUpdateResult());
-
-		ais.add(new AgressiveAI(shipTwo));
-		
-		c.initializeCombat(ais, player);
-		
-		CombatUpdate cu = c.run();
-		current = cu.getRetreatLocation();
-		player.update(cu.getPu());
-		player.ship.update(cu.getSu());
-		
-		System.exit(1);
-		*/
-		
-		
-		
-		
 		String in;
-		
+
 		System.out.println(player.toString());
-		
+
 		current = sector.getFirstLocation(worldSize, worldDensity);
-		
+
 		// Main Game Loop
 		while (player.getEnergy() > 0 && player.ship.getHull() > 0) {
 			current.printLocation();
@@ -138,25 +150,23 @@ public class HeatDeath {
 		}
 
 		if (player.getEnergy() <= 0) {
-			System.out
-					.println("Your stumble and you feel yourself fall as the world fades to black.");
+			System.out.println("Your stumble and you feel yourself fall as the world fades to black.");
 		} else if (player.ship.getHull() <= 0) {
-			System.out
-					.println("Your ship's integrity collapses and you are crushed as the gravity well implodes.");
+			System.out.println("Your ship's integrity collapses and you are crushed as the gravity well implodes.");
 		} else {
 			System.out.println("Unknown cause of death.");
 		}
 	}
-	
-	//TODO depreciate, use UI instead
+
+	// TODO depreciate, use UI instead
 	public void newGameQuick() {
-		
+
 		player = new Player(Randomizer.randomName());
 		fileManager = new GameFileManager();
 		fileManager.setP(player);
 		fileManager.fileManagerClean();
 		fileManager.fileManagerMakeGameFiles();
-		
+
 		worldSize = 30;
 		worldDensity = 15;
 		player.ship.setName(Randomizer.randomName());
@@ -164,28 +174,28 @@ public class HeatDeath {
 		sector = world.getActiveSector();
 		debug = true;
 	}
-	
-	//TODO depreciate, use UI instead
-	public void newGame() {		
-		
+
+	// TODO depreciate, use UI instead
+	public void newGame() {
+
 		String in;
 		debug = false;
 
 		System.out.println("What is your name?");
 		in = IOHandler.getInput();
 		player = new Player(in);
-		
+
 		fileManager = new GameFileManager();
 		fileManager.setP(player);
 		fileManager.fileManagerMakeGameFiles();
-		
+
 		System.out.println("Name your ship:");
 		in = IOHandler.getInput();
 		player.ship.setName(in);
-		
-		// 
+
+		//
 		int worldSizeCap = 10;
-		
+
 		System.out.println("World Size? (1 to " + worldSizeCap + ")");
 		System.out.println("1 -- Very Small");
 		System.out.println("5 -- Normal");
@@ -195,11 +205,11 @@ public class HeatDeath {
 			System.out.println("Invalid world size");
 			index = IOHandler.getIndex(IOHandler.getInput());
 		}
-		
+
 		worldSize = index;
 		index = -1;
-		
-		if(worldSize == 1) {
+
+		if (worldSize == 1) {
 			worldDensity = 0;
 		} else {
 			System.out.println("World Density? (1 - " + worldSize + ")");
@@ -211,21 +221,21 @@ public class HeatDeath {
 			}
 			worldDensity = index;
 		}
-		
+
 		System.out.println("Creating world ...");
 		world = new World(worldSize, worldDensity, fileManager);
 		sector = world.getActiveSector();
 		System.out.println("Done");
-		
-		if(debug) {
+
+		if (debug) {
 			System.out.println(world.getSize() + " locations created");
 			System.out.println("Init Done");
 		}
 	}
-	
+
 	public String index(String in) {
 		int input = IOHandler.getIndex(in);
-		
+
 		if (input >= 0 && input < current.getOptions().size()) {
 			in = current.getOptions().get(input);
 		}
@@ -236,9 +246,9 @@ public class HeatDeath {
 	public String option(String option) {
 		for (int i = 0; i < current.getNumOptions(); i++) {
 			if (option.equalsIgnoreCase(current.getOption(i).getName())) {
-				
+
 				Option opt = current.getOption(i);
-				
+
 				updatePlayerShip(opt);
 
 				warnings();
@@ -247,30 +257,30 @@ public class HeatDeath {
 		}
 		return option;
 	}
-	
-	//TODO depreciate, use update instead
+
+	// TODO depreciate, use update instead
 	public void updatePlayerShip(Option opt) {
 		opt.execute(current);
 		Update update = opt.getUpdate();
-		
+
 		PlayerUpdateResult pur = player.update(update.getPu());
-		if(pur.isSuccess()) {
+		if (pur.isSuccess()) {
 			ShipUpdateResult sur = player.ship.update(update.getSu());
-			if(sur.isSuccess()) {
-				
-				if(update.getLu() != null) {
+			if (sur.isSuccess()) {
+
+				if (update.getLu() != null) {
 					fileManager.fileManagerSaveSector(sector);
 					String sectorName = world.lookupSectorNameById(update.getLu().getSector());
 					sector = fileManager.loadSector(sectorName);
-					sector.getWormholeLocation(update.getLu().getWormholeId());			
+					sector.getWormholeLocation(update.getLu().getWormholeId());
 				}
-				
+
 				String result = pur.getResult();
-				if(!result.equalsIgnoreCase("")) {
+				if (!result.equalsIgnoreCase("")) {
 					System.out.println(result);
 				}
 				result = sur.getResult();
-				if(!result.equalsIgnoreCase("")) {
+				if (!result.equalsIgnoreCase("")) {
 					System.out.println(result);
 				}
 			} else {
@@ -278,40 +288,41 @@ public class HeatDeath {
 				System.out.println(sur.getResult());
 			}
 		} else {
-			if(pur.getResult() != null) {
+			if (pur.getResult() != null) {
 				System.out.println(pur.getResult());
 			}
 		}
 	}
-	
+
 	public UpdateResult update(Update update) {
-		if(update == null) System.out.println("Severe: update null crash incoming");
-		
+		if (update == null)
+			System.out.println("Severe: update null crash incoming");
+
 		UpdateResult ur = new UpdateResult();
 		PlayerUpdateResult pur = player.update(update.getPu());
-		if(pur.isSuccess()) {
+		if (pur.isSuccess()) {
 			ShipUpdateResult sur = player.ship.update(update.getSu());
-			if(sur.isSuccess()) {
+			if (sur.isSuccess()) {
 				LocationUpdateResult lur = world.update(update.getLu(), fileManager);
-				
-				if(lur.isSuccess()) {
-					if(lur.isNewLocation()) {
+
+				if (lur.isSuccess()) {
+					if (lur.isNewLocation()) {
 						current = lur.getLoc();
 					}
-					if(lur.isNewSector()) {
+					if (lur.isNewSector()) {
 						sector = world.getActiveSector();
 					}
-					
-					if(current.getUsed() == LocationStatus.Unused || current.getUsed() == LocationStatus.Unvisited) {
+
+					if (current.getUsed() == LocationStatus.Unused || current.getUsed() == LocationStatus.Unvisited) {
 						current.setUsed(LocationStatus.Visited);
 						sector.addConnection(current, worldSize, worldDensity);
 						sector.addUsedConnection(current, worldSize, worldDensity);
 					}
-					
+
 					player.applyUpdate(update.getPu());
 					player.ship.applyUpdate(update.getSu());
 				}
-				
+
 				ur = new UpdateResult(pur, sur, lur);
 			} else {
 				ur = new UpdateResult(pur, sur);
@@ -321,17 +332,17 @@ public class HeatDeath {
 		}
 		return ur;
 	}
-	
-	//TODO depreciate, move into update
+
+	// TODO depreciate, move into update
 	public String travelInterior(String in) {
 		Interior interior;
 		ArrayList<Interior> interiorConnections = current.getInteriorConnections();
-		if(interiorConnections != null && interiorConnections.size() > 0) {
-			for(int i = 0; i < current.getInteriorConnections().size(); i++) {
+		if (interiorConnections != null && interiorConnections.size() > 0) {
+			for (int i = 0; i < current.getInteriorConnections().size(); i++) {
 				interior = current.getInteriorConnection(i);
-				if(interior.getName().equalsIgnoreCase(in)) {
+				if (interior.getName().equalsIgnoreCase(in)) {
 					int energyCost = interior.getEnergyCost();
-					if(player.getEnergy() - energyCost <= 0) {
+					if (player.getEnergy() - energyCost <= 0) {
 						// Deadly action to player
 						System.out.println("Cannot enter " + interior.getName() + ". You do not have enough energy.");
 						return "";
@@ -346,8 +357,8 @@ public class HeatDeath {
 		}
 		return in;
 	}
-	
-	//TODO depreciate, moved into interior
+
+	// TODO depreciate, moved into interior
 	/*
 	 * Traveling function Arguments: input string of desired destination
 	 * 
@@ -360,11 +371,11 @@ public class HeatDeath {
 		Location test;
 		for (int i = 0; i < current.getConnections().size(); i++) {
 			test = current.getConnection(i);
-			if(test != null && location.equalsIgnoreCase(test.getName())) {
-				
-				if(current.isInterior()) {
+			if (test != null && location.equalsIgnoreCase(test.getName())) {
+
+				if (current.isInterior()) {
 					int energyCost = ((Interior) current).getEnergyCost();
-					if(player.getEnergy() - energyCost <= 0) {
+					if (player.getEnergy() - energyCost <= 0) {
 						System.out.println("Cannot get to " + test.getName() + ". You do not have enough energy.");
 						return "";
 					} else {
@@ -376,13 +387,13 @@ public class HeatDeath {
 				// Deduct Fuel to travel
 				int fuelConsumption = player.ship.getEfficiency();
 				fuelConsumption *= 1 + player.ship.overloaded();
-				
+
 				if (player.ship.getFuel() >= fuelConsumption) {
 					current = test;
 					player.ship.subFuel(fuelConsumption);
-					
+
 					// If the world hasn't been visited, add some connections
-					if (current.getUsed().equals(LocationStatus.Unvisited)) {				
+					if (current.getUsed().equals(LocationStatus.Unvisited)) {
 						sector.addConnection(current, worldSize, worldDensity);
 						sector.addUsedConnection(current, worldSize, worldDensity);
 						current.setUsed(LocationStatus.Visited);
@@ -390,12 +401,12 @@ public class HeatDeath {
 
 					if (player.getEnergy() > 5) {
 						// Enough energy to survive trip
-						//printLocation(current);
+						// printLocation(current);
 						player.subEnergy(5);
 						warnings();
 					} else {
 						System.out.println("You collapse before arriving. Game Over");
-						//TODO handle exiting better
+						// TODO handle exiting better
 						System.exit(1);
 					}
 					return "";
@@ -409,7 +420,7 @@ public class HeatDeath {
 		return location;
 	}
 
-	//TODO depreciate, no longer support text options
+	// TODO depreciate, no longer support text options
 	public String globalOptions(String option) {
 
 		if (option.equalsIgnoreCase("quit")) {
@@ -418,15 +429,15 @@ public class HeatDeath {
 			System.exit(1);
 		}
 
-//		if (option.equalsIgnoreCase("eat")) {
-//
-//			System.out.println("Attempting to eat");
-//			int amount = player.eat();
-//			if (amount > 0)
-//				System.out.println("Gained " + amount + " energy from eating.");
-//			player.addEnergy(amount);
-//			return "";
-//		}
+		// if (option.equalsIgnoreCase("eat")) {
+		//
+		// System.out.println("Attempting to eat");
+		// int amount = player.eat();
+		// if (amount > 0)
+		// System.out.println("Gained " + amount + " energy from eating.");
+		// player.addEnergy(amount);
+		// return "";
+		// }
 
 		if (option.equalsIgnoreCase("refuel")) {
 			System.out.println("Attempting to refuel from cargo.");
@@ -453,7 +464,7 @@ public class HeatDeath {
 				player.ship.repair();
 			} else {
 				int amount = IOHandler.getIndex(in);
-				
+
 				if (amount > 0) {
 					player.ship.repair(amount);
 					return "";
@@ -464,8 +475,8 @@ public class HeatDeath {
 			}
 
 		}
-		
-		if(option.equalsIgnoreCase("manageShip")) {
+
+		if (option.equalsIgnoreCase("manageShip")) {
 			manageShip();
 			return "";
 		}
@@ -509,19 +520,19 @@ public class HeatDeath {
 		}
 
 		// DEBUG
-//		if (option.equalsIgnoreCase("food") && debug) {
-//
-//			System.out.println("Giving the player a simple ration");
-//			player.addItem(new SimpleRation());
-//			return "";
-//		}
+		// if (option.equalsIgnoreCase("food") && debug) {
+		//
+		// System.out.println("Giving the player a simple ration");
+		// player.addItem(new SimpleRation());
+		// return "";
+		// }
 
 		// DEBUG
 		if (option.equalsIgnoreCase("givefuel") && debug) {
 			player.ship.addFuel(490);
 			return "";
 		}
-		
+
 		// DEBUG
 		if (option.equalsIgnoreCase("giveMoney") && debug) {
 			player.addMoney(1000);
@@ -547,7 +558,7 @@ public class HeatDeath {
 			System.out.println("Unrecognized instruction: '" + in + "'");
 		}
 	}
-	
+
 	public void manageShip() {
 		System.out.println("What do you want to manage?");
 		System.out.println("0 -- Inventory");
@@ -555,76 +566,74 @@ public class HeatDeath {
 		System.out.println("2 -- Scrap");
 		String in = IOHandler.getInput();
 		int index = IOHandler.getIndex(in);
-		
-		if(index == 0) {
+
+		if (index == 0) {
 			in = "inventory";
-		} else if(index == 1) {
+		} else if (index == 1) {
 			in = "upgrades";
-		} else if(index == 2) {
+		} else if (index == 2) {
 			in = "scrap";
 		} else {
 			in = "invalid";
 		}
-		
-		if(in.equalsIgnoreCase("inventory")) {
+
+		if (in.equalsIgnoreCase("inventory")) {
 			manageShipInventory();
-		} else if(in.equalsIgnoreCase("upgrades")) {
+		} else if (in.equalsIgnoreCase("upgrades")) {
 			manageShipUpgrades();
-		} else if(in.equalsIgnoreCase("scrap")) {
+		} else if (in.equalsIgnoreCase("scrap")) {
 			manageShipScrap();
-		} else if(in.equalsIgnoreCase("invalid")) {
+		} else if (in.equalsIgnoreCase("invalid")) {
 			System.out.println("Invalid choice.");
 		}
 	}
-	
+
 	public void manageShipInventory() {
 		System.out.println(player.ship.listInventory(true));
 		String in = IOHandler.getInput();
 		int index = IOHandler.getIndex(in);
-		
-		if(index > -1 && index < player.ship.getInventory().size()) {
+
+		if (index > -1 && index < player.ship.getInventory().size()) {
 			ShipUpdate su = player.ship.getInventory().get(index).interact();
 			ShipUpdateResult sur = player.ship.update(su);
 			String str = sur.getResult();
 			System.out.println(str);
 		} else {
-			// traverse through the inventory trying to match the name? or just invalid...
+			// traverse through the inventory trying to match the name? or just
+			// invalid...
 		}
 	}
-	
+
 	public void manageShipUpgrades() {
-		
-		
+
 		System.out.println("Which family of upgrades?");
-		
-		String[] manageOptions = {"Generic", "Engine", "Shield", "Hull", "Weapon", "Other"};
-		
+
+		String[] manageOptions = { "Generic", "Engine", "Shield", "Hull", "Weapon", "Other" };
+
 		int index = IOHandler.getIndex(IOHandler.createOptionsTable(manageOptions));
 
 		List<Upgrade> upgrades = player.ship.getUpgrades(UpgradeFamily.lookup(index));
-		
-		
-		if(upgrades.size() == 0) {
+
+		if (upgrades.size() == 0) {
 			System.out.println("No " + UpgradeFamily.lookup(index).toString() + " upgrades to manage.");
 		} else {
 			ArrayList<String> upgradeOptions = new ArrayList<String>(upgrades.size());
 
-			for(Upgrade u : upgrades) {
+			for (Upgrade u : upgrades) {
 				upgradeOptions.add(u.getName());
 			}
-			
-			
+
 			index = IOHandler.getIndex(IOHandler.createOptionsTable(upgradeOptions));
 
 			System.out.println("TODO: Manage upgrades, remove, install, etc");
 		}
 	}
-	
+
 	public void manageShipScrap() {
 		System.out.println("What do you want to do?");
 		System.out.println("You have " + player.ship.getScrap() + " scrap.");
 	}
-	
+
 	public void setCurrentLocation(Location loc) {
 		current = loc;
 	}

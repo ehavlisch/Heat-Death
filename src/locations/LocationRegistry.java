@@ -1,5 +1,10 @@
 package locations;
 
+/*
+ * TODO change to custom class that can read in additional location types and their values
+ * (We can't change the enum at run time - would have to recompile source code to change)
+ */
+
 public enum LocationRegistry {
 	//Name(uniqueId, Name shown when creating (plural), Class Name, maxPerSector, chanceOfGeneration)
 	NeutronStar(0, true, "Neutron Stars", "NeutronStar", 5, 99, 100), 

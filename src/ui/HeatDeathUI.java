@@ -1,7 +1,5 @@
 package ui;
 
-import interiors.Interior;
-
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
@@ -26,19 +24,14 @@ import javax.swing.JScrollPane;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
 
 import options.Option;
 
 import locations.Location;
-import locations.LocationStatus;
 import locations.LocationUpdate;
-import locations.LocationUpdateResult;
 import locations.World;
 import main.HeatDeath;
-import main.L;
-import main.Randomizer;
+import main.Lang;
 import main.Update;
 import main.UpdateResult;
 
@@ -54,14 +47,13 @@ import gameOptions.Resolution;
 
 import player.Player;
 import player.PlayerUpdate;
-import player.PlayerUpdateResult;
 import ship.ShipUpdate;
-import ship.ShipUpdateResult;
+import uiElements.NewGamePanel;
 
 public class HeatDeathUI extends HeatDeath {
 	
-	private int frameWidth = 800;
-	private int frameHeight = 600;
+	private int frameWidth;
+	private int frameHeight;
 
 	private JFrame mainFrame;
 	
@@ -85,11 +77,7 @@ public class HeatDeathUI extends HeatDeath {
 	private Map<UiZone, JPanel> previousDisplay;
 	private JPanel overlay;
 	
-	private JPanel newGamePanel;
-	private JTextField newGameNameTextField;
-	private JTextField newGameShipTextField;
-	private JSpinner newGameWorldSizeSpinner;
-	private JSpinner newGameWorldDensitySpinner;
+	private NewGamePanel newGamePanel;
 	
 	private JPanel optionsPanel;
 	private JComboBox<Resolution> resolutionComboBox;
@@ -136,7 +124,7 @@ public class HeatDeathUI extends HeatDeath {
 	private void initialize() {
 		mainFrame = new JFrame();
 		mainFrame.setResizable(false);
-		mainFrame.setTitle(L.gameName);
+		mainFrame.setTitle(Lang.gameName);
 		mainFrame.setBounds(100, 100, frameWidth, frameHeight);
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
@@ -144,13 +132,15 @@ public class HeatDeathUI extends HeatDeath {
 		mainMenuBar = new JMenuBar();
 		mainFrame.setJMenuBar(mainMenuBar);
 		
-		fileMenu = new JMenu(L.menuFile);
+		fileMenu = new JMenu(Lang.menuFile);
 		mainMenuBar.add(fileMenu);
 		
-		JMenuItem newGameMenu = new JMenuItem(L.newGameButton);
+		newGamePanel = new NewGamePanel(this);
+		
+		JMenuItem newGameMenu = new JMenuItem(Lang.newGameButton);
 		newGameMenu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				initNewGamePanel();
+				//initNewGamePanel();
 				player = null;
 				world = null;
 				sector = null;
@@ -163,7 +153,7 @@ public class HeatDeathUI extends HeatDeath {
 		
 		fileMenu.add(newGameMenu);
 		
-		JMenuItem optionsMenu = new JMenuItem(L.menuOptions);
+		JMenuItem optionsMenu = new JMenuItem(Lang.menuOptions);
 		optionsMenu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				initOptionsPanel();
@@ -213,7 +203,7 @@ public class HeatDeathUI extends HeatDeath {
 		leftScrollPane.setViewportView(leftOptionPanel);
 	}
 	
-	public void newGame(String name, String ship, int worldSize, int worldDensity) {
+	public void newGame(String name, String ship) {
 
 		debug = true;
 		
@@ -267,7 +257,7 @@ public class HeatDeathUI extends HeatDeath {
 			FormFactory.RELATED_GAP_ROWSPEC,
 		}));
 		
-		JLabel optionsLabel = new JLabel(L.optionsLabel);
+		JLabel optionsLabel = new JLabel(Lang.optionsLabel);
 
 		optionsPanel.add(optionsLabel, "2, 2");
 		
@@ -275,7 +265,7 @@ public class HeatDeathUI extends HeatDeath {
 		resolutionComboBox.setModel(new DefaultComboBoxModel<Resolution>(Resolution.values()));
 		optionsPanel.add(resolutionComboBox, "2, 4");
 		
-		JButton optionsSaveButton = new JButton(L.saveButton);
+		JButton optionsSaveButton = new JButton(Lang.saveButton);
 		optionsSaveButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("Saving options");
@@ -302,18 +292,18 @@ public class HeatDeathUI extends HeatDeath {
 		StringBuilder sb = new StringBuilder();
 		if (player.getEnergy() < 10) {
 			warning = true;
-			sb.append(L.warningPlayerEnergy);
+			sb.append(Lang.warningPlayerEnergy);
 		}
 		if(player.ship.getFuel() < player.ship.getEfficiency()) {
 			warning = true;
-			sb.append(L.warningShipFuelEmpty);
+			sb.append(Lang.warningShipFuelEmpty);
 		} else if (player.ship.getFuel() < (player.ship.getEfficiency() * 3) + 1) {
 			warning = true;
-			sb.append(L.warningShipFuelLow);
+			sb.append(Lang.warningShipFuelLow);
 		} 
 		if (player.ship.overloaded() > 0) {
 			warning = true;
-			sb.append(L.warningShipOverloaded);
+			sb.append(Lang.warningShipOverloaded);
 		}
 		if(warning) {
 			warningPanel = new JPanel();
@@ -322,7 +312,7 @@ public class HeatDeathUI extends HeatDeath {
 			warningLabel.setForeground(Color.RED);
 			warningPanel.add(warningLabel);
 			
-			JButton closeWarningButton = new JButton(L.closeButton);
+			JButton closeWarningButton = new JButton(Lang.closeButton);
 			closeWarningButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					clearSinglePanel(UiZone.South);
@@ -480,19 +470,19 @@ public class HeatDeathUI extends HeatDeath {
 		JLabel playerNameLabel = new JLabel(player.getName());
 		shipPanel.add(playerNameLabel);
 		
-		addStatusField(shipPanel, L.playerEnergyLabel, player.getEnergy(), player.getMaxEnergy());
-		addStatusField(shipPanel, L.playerMoneyLabel, player.getMoney(), null);
+		addStatusField(shipPanel, Lang.playerEnergyLabel, player.getEnergy(), player.getMaxEnergy());
+		addStatusField(shipPanel, Lang.playerMoneyLabel, player.getMoney(), null);
 		
 		JLabel shipNameLabel = new JLabel(player.ship.getName());
 		shipPanel.add(shipNameLabel);
 		
-		addStatusField(shipPanel, L.shipHullLabel, player.ship.getHull(), player.ship.getMaxHull());
-		addStatusField(shipPanel, L.shipFuelLabel, player.ship.getFuel(), player.ship.getMaxFuel());
-		addStatusField(shipPanel, L.shipLoadLabel, player.ship.getLoad(), player.ship.getCapacity());
-		addStatusField(shipPanel, L.shipScrapLabel, player.ship.getScrap(), null);
-		addStatusField(shipPanel, L.shipEfficiencyLabel, player.ship.getEfficiency(), null);
+		addStatusField(shipPanel, Lang.shipHullLabel, player.ship.getHull(), player.ship.getMaxHull());
+		addStatusField(shipPanel, Lang.shipFuelLabel, player.ship.getFuel(), player.ship.getMaxFuel());
+		addStatusField(shipPanel, Lang.shipLoadLabel, player.ship.getLoad(), player.ship.getCapacity());
+		addStatusField(shipPanel, Lang.shipScrapLabel, player.ship.getScrap(), null);
+		addStatusField(shipPanel, Lang.shipEfficiencyLabel, player.ship.getEfficiency(), null);
 
-		JButton manageShipButton = new JButton(L.manageShipButton);
+		JButton manageShipButton = new JButton(Lang.manageShipButton);
 		manageShipButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				initManageShipPanel();
@@ -502,7 +492,7 @@ public class HeatDeathUI extends HeatDeath {
 		
 		shipPanel.add(manageShipButton);
 		
-		JButton manageCargoButton = new JButton(L.manageCargoButton);
+		JButton manageCargoButton = new JButton(Lang.manageCargoButton);
 		manageCargoButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				initManageCargoPanel();
@@ -511,7 +501,7 @@ public class HeatDeathUI extends HeatDeath {
 		});
 		shipPanel.add(manageCargoButton);
 		
-		JButton manageUpgradesButton = new JButton(L.manageUpgradesButton);
+		JButton manageUpgradesButton = new JButton(Lang.manageUpgradesButton);
 		manageUpgradesButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				initManageUpgradesPanel();
@@ -524,7 +514,7 @@ public class HeatDeathUI extends HeatDeath {
 	}
 	
 	public JButton createBackToShipPanelButton() {
-		JButton back = new JButton(L.backButton);
+		JButton back = new JButton(Lang.backButton);
 		
 		back.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -574,7 +564,7 @@ public class HeatDeathUI extends HeatDeath {
 		
 		currentRow += 2;
 		
-		JLabel repairLabel = new JLabel(L.repairShipLabel);
+		JLabel repairLabel = new JLabel(Lang.repairShipLabel);
 		manageShipPanel.add(repairLabel, "2, " + currentRow);
 		
 		JLabel currentHullLabel = new JLabel(player.ship.getHull() + "/" + player.ship.getMaxHull());
@@ -586,26 +576,26 @@ public class HeatDeathUI extends HeatDeath {
 			JTextField repairTextField = new JTextField();
 			manageShipPanel.add(repairTextField, "2, " + currentRow);
 			
-			JButton repairAmountButton = new JButton(L.repairShipButton);
+			JButton repairAmountButton = new JButton(Lang.repairShipButton);
 			manageShipPanel.add(repairAmountButton, "4, " + currentRow);
 			
-			JButton repairAllButton = new JButton(L.repairAllButton);
+			JButton repairAllButton = new JButton(Lang.repairAllButton);
 			manageShipPanel.add(repairAllButton, "6, " + currentRow);
 			
 			currentRow += 2;
 		}
 		
 		JTextField salvageHullTextField = new JTextField();
-		salvageHullTextField.setToolTipText(L.salvageHullTooltip);
+		salvageHullTextField.setToolTipText(Lang.salvageHullTooltip);
 		manageShipPanel.add(salvageHullTextField, "2, " + currentRow);
 		
-		JButton salvageHullButton = new JButton(L.salvageHullButton);
-		salvageHullButton.setToolTipText(L.salvageHullTooltip);
+		JButton salvageHullButton = new JButton(Lang.salvageHullButton);
+		salvageHullButton.setToolTipText(Lang.salvageHullTooltip);
 		manageShipPanel.add(salvageHullButton, "4, " + currentRow);
 		
 		currentRow += 2;
 		
-		JLabel fuelManageLabel = new JLabel(L.manageFuelLabel);
+		JLabel fuelManageLabel = new JLabel(Lang.manageFuelLabel);
 		manageShipPanel.add(fuelManageLabel, "2, " + currentRow);
 		
 		currentRow += 2;
@@ -613,10 +603,10 @@ public class HeatDeathUI extends HeatDeath {
 		JTextField dumpFuelTextField = new JTextField();
 		manageShipPanel.add(dumpFuelTextField, "2, " + currentRow);
 		
-		JButton dumpFuelButton = new JButton(L.dumpFuelButton);
+		JButton dumpFuelButton = new JButton(Lang.dumpFuelButton);
 		manageShipPanel.add(dumpFuelButton, "4, " + currentRow);
 		
-		JButton dumpAllFuelButton = new JButton (L.dumpAllFuelButton);
+		JButton dumpAllFuelButton = new JButton (Lang.dumpAllFuelButton);
 		manageShipPanel.add(dumpAllFuelButton, "6, " + currentRow);
 		
 		currentRow += 2;
@@ -651,82 +641,6 @@ public class HeatDeathUI extends HeatDeath {
 		locationPanel.add(locationTextArea, BorderLayout.CENTER);
 	}
 	
-	public void initNewGamePanel() {
-		newGamePanel = new JPanel();
-		
-		newGamePanel.setLayout(
-			new FormLayout(new ColumnSpec[] {
-				FormFactory.RELATED_GAP_COLSPEC,
-				FormFactory.DEFAULT_COLSPEC,
-				FormFactory.RELATED_GAP_COLSPEC,
-				FormFactory.DEFAULT_COLSPEC,
-				FormFactory.RELATED_GAP_COLSPEC,},
-			new RowSpec[] {
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				}));
-			
-		JLabel newGameNameLabel = new JLabel(L.newGameNameLabel);
-		newGamePanel.add(newGameNameLabel, "2, 2, right, default");
-		
-		newGameNameTextField = new JTextField();
-		newGamePanel.add(newGameNameTextField, "4, 2, fill, default");
-		newGameNameTextField.setColumns(10);
-		
-		JLabel newGameShipLabel = new JLabel(L.newGameShipNameLabel);
-		newGamePanel.add(newGameShipLabel, "2, 4, right, default");
-		
-		newGameShipTextField = new JTextField();
-		newGamePanel.add(newGameShipTextField, "4, 4, fill, default");
-		newGameShipTextField.setColumns(10);
-		
-		JLabel newGameWorldSizeLabel = new JLabel(L.newGameWorldSizeLabel);
-		newGamePanel.add(newGameWorldSizeLabel, "2, 6");
-		
-		newGameWorldSizeSpinner = new JSpinner();
-		newGameWorldSizeSpinner.setModel(new SpinnerNumberModel(5, 1, 100, 1));
-		newGamePanel.add(newGameWorldSizeSpinner, "4, 6");
-		
-		JLabel newGameWorldDensityLabel = new JLabel(L.newGameWorldDensityLabel);
-		newGamePanel.add(newGameWorldDensityLabel, "2, 8");
-		
-		newGameWorldDensitySpinner = new JSpinner();
-		newGameWorldDensitySpinner.setModel(new SpinnerNumberModel(5, 1, 100, 1));
-		newGamePanel.add(newGameWorldDensitySpinner, "4, 8");
-		
-		JButton newGameCreateButton = new JButton(L.newGameButton);
-		newGameCreateButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				boolean ok = true;
-				String gameName = newGameNameTextField.getText();
-				String shipName = newGameShipTextField.getText();
-				if(gameName == null || gameName.length() == 0) {
-					newGameNameTextField.setText(Randomizer.randomName());
-					ok = false;
-				} else if(shipName == null || shipName.length() == 0) {
-					newGameShipTextField.setText(Randomizer.randomName());
-					ok = false;
-				}
-				if(ok) {
-					worldSize = (int) newGameWorldSizeSpinner.getValue();
-					worldDensity = (int) newGameWorldDensitySpinner.getValue();
-					newGame(gameName, shipName, worldSize, worldDensity);							
-				}
-			}
-		});
-		
-		newGamePanel.add(newGameCreateButton, "4, 10");
-
-	}
 	public void clearSinglePanel(UiZone uiZone) {
 		synchronized(displayLock) {			
 			if(uiZone == UiZone.Center) {
@@ -941,5 +855,13 @@ public class HeatDeathUI extends HeatDeath {
 			System.out.println("SEVERE: Exception updating display");
 			e.printStackTrace();
 		}
+	}
+
+	public void setWorldSize(int worldSize) {
+		this.worldSize = worldSize;
+	}
+	
+	public void setWorldDensity(int worldDensity) {
+		this.worldDensity = worldDensity;
 	}
 }

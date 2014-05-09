@@ -2,8 +2,9 @@ package locations;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
-import childrenLocations.Wormhole;
+import childrenLocations.*;
 
 import filesystem.GameFileManager;
 
@@ -51,6 +52,10 @@ public class World {
 			Sector s = new Sector(Randomizer.randomName(), sectorId);
 			sectorLookup.put(sectorId, s.getName());
 			s.initializeSector();
+			
+			// Populate unique locations list
+			UniqueLocationRegistry ulr = new UniqueLocationRegistry();
+			
 
 			// TODO Add wormholes into the sector
 			for(int wormholeRow = 0; wormholeRow < worldDensity; wormholeRow++) {
@@ -113,6 +118,11 @@ public class World {
 			// TODO inject unique locations into sectors
 			
 			ArrayList<Location> locations = s.getAllLocations();
+			
+			List<Location> uniqueLocations = ulr.getSomeLocations(worldSize);
+			if(uniqueLocations != null) {
+				locations.addAll(uniqueLocations);
+			}
 			
 			// Save the active sector in memory, save the others to files
 			if(sectorId == worldSize-1) {
