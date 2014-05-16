@@ -5,7 +5,6 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
@@ -28,8 +27,7 @@ public class NewGamePanel extends ParentPanel {
 	private JSpinner newGameWorldDensitySpinner;
 	
 	public NewGamePanel(HeatDeathUI parent) {
-		super();
-		this.setHeatDeathUI(parent);
+		super(parent);
 		
 		this.setLayout(
 			new FormLayout(new ColumnSpec[] {

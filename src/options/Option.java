@@ -5,19 +5,12 @@ import items.Item;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import player.PlayerUpdate;
-import ship.ShipUpdate;
 import shipUpgrades.Upgrade;
 import locations.Location;
-import locations.LocationUpdate;
 import main.Update;
 
 @SuppressWarnings("serial")
 public abstract class Option implements Serializable {
-	
-//	protected PlayerUpdate pu;
-//	protected ShipUpdate su;	
-//	protected LocationUpdate lu;
 	
 	protected Update update;
 	

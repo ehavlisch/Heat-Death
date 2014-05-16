@@ -1,4 +1,4 @@
-package ui;
+package uiElements;
 
 import javax.swing.JButton;
 
@@ -21,7 +21,4 @@ public class OptionButton extends JButton {
 	public void setOption(Option option) {
 		this.option = option;
 	}
-	
-	
-
 }

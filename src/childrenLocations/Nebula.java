@@ -24,8 +24,8 @@ public class Nebula extends Location {
 			
 			ArrayList<SearchOption> searchOptions = new ArrayList<SearchOption>(2);
 			int scrap = RNG.random(15) + 5;
-			searchOptions.add(new SearchOption(null, new ShipUpdate(-5, 0, scrap), 20, "You gathered enough materials to form " + scrap + " scrap."));
-			searchOptions.add(new SearchOption(null, new ShipUpdate(-5 + scrap, 0, 0), 0, "You gathered enough materials to form " + scrap + " fuel."));
+			searchOptions.add(new SearchOption(null, new ShipUpdate(-1, 0, scrap), 20, "You gathered enough materials to form " + scrap + " scrap."));
+			searchOptions.add(new SearchOption(null, new ShipUpdate(-1 + scrap, 0, 0), 0, "You gathered enough materials to form " + scrap + " fuel."));
 
 			SearchOptionContainer soc = new SearchOptionContainer(searchOptions);
 			this.addOption(new GenericSearch("Gather particles", soc));

@@ -29,6 +29,7 @@ import options.Option;
 
 import locations.Location;
 import locations.LocationUpdate;
+import locations.LocationUpdateResult;
 import locations.World;
 import main.HeatDeath;
 import main.Lang;
@@ -47,8 +48,17 @@ import gameOptions.Resolution;
 
 import player.Player;
 import player.PlayerUpdate;
+import player.PlayerUpdateResult;
 import ship.ShipUpdate;
+import ship.ShipUpdateResult;
+import uiElements.GameOptionsPanel;
+import uiElements.LocationPanel;
 import uiElements.NewGamePanel;
+import uiElements.OptionButton;
+import uiElements.OptionsPanel;
+import uiElements.ShipPanel;
+import uiElements.TravelButton;
+import uiElements.NotificationPanel;
 
 public class HeatDeathUI extends HeatDeath {
 	
@@ -80,9 +90,8 @@ public class HeatDeathUI extends HeatDeath {
 	private NewGamePanel newGamePanel;
 	
 	private JPanel optionsPanel;
-	private JComboBox<Resolution> resolutionComboBox;
 	
-	private JPanel shipPanel;
+	private ShipPanel shipPanel;
 	
 	private JPanel locationPanel;
 	
@@ -94,7 +103,7 @@ public class HeatDeathUI extends HeatDeath {
 	
 	private JPanel manageUpgradesPanel;
 
-	private JPanel warningPanel;
+	//private WarningPanel warningPanel;
 	
 	public static void main(String[] args) {
 		
@@ -135,6 +144,7 @@ public class HeatDeathUI extends HeatDeath {
 		fileMenu = new JMenu(Lang.menuFile);
 		mainMenuBar.add(fileMenu);
 		
+		/* Static resources */
 		newGamePanel = new NewGamePanel(this);
 		
 		JMenuItem newGameMenu = new JMenuItem(Lang.newGameButton);
@@ -154,12 +164,16 @@ public class HeatDeathUI extends HeatDeath {
 		fileMenu.add(newGameMenu);
 		
 		JMenuItem optionsMenu = new JMenuItem(Lang.menuOptions);
+		
+		optionsPanel = new GameOptionsPanel(this);
+		
 		optionsMenu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				initOptionsPanel();
+				//initOptionsPanel();
 				showOverlay(optionsPanel);
 			}
 		});
+		
 		
 		fileMenu.add(optionsMenu);
 		
@@ -219,72 +233,17 @@ public class HeatDeathUI extends HeatDeath {
 		current = sector.getFirstLocation(worldSize, worldDensity);
 		
 		initLocationOptionsPanel();
-		initShipPanel();
-		initLocationPanel();
+		
+		//TODO this should be an update if possible
+		shipPanel = new ShipPanel(this);
+
+		locationPanel = new LocationPanel(current);
 		
 		Map<UiZone, JPanel> toDisplay = new HashMap<UiZone, JPanel>();
 		toDisplay.put(UiZone.West, locationOptionsPanel);
 		toDisplay.put(UiZone.East, shipPanel);
 		toDisplay.put(UiZone.Center, locationPanel);
 		updateDisplay(toDisplay);
-	}
-	
-	public void initOptionsPanel() {
-		optionsPanel = new JPanel();
-		optionsPanel.setLayout(new FormLayout(new ColumnSpec[] {
-			FormFactory.RELATED_GAP_COLSPEC,
-			FormFactory.DEFAULT_COLSPEC,
-			FormFactory.RELATED_GAP_COLSPEC,
-			FormFactory.DEFAULT_COLSPEC,
-			FormFactory.RELATED_GAP_COLSPEC,
-			FormFactory.DEFAULT_COLSPEC,
-			FormFactory.RELATED_GAP_COLSPEC,
-		}, new RowSpec[] {
-			FormFactory.RELATED_GAP_ROWSPEC,
-			FormFactory.DEFAULT_ROWSPEC,
-			FormFactory.RELATED_GAP_ROWSPEC,
-			FormFactory.DEFAULT_ROWSPEC,
-			FormFactory.RELATED_GAP_ROWSPEC,
-			FormFactory.DEFAULT_ROWSPEC,
-			FormFactory.RELATED_GAP_ROWSPEC,
-			FormFactory.DEFAULT_ROWSPEC,
-			FormFactory.RELATED_GAP_ROWSPEC,
-			FormFactory.DEFAULT_ROWSPEC,
-			FormFactory.RELATED_GAP_ROWSPEC,
-			FormFactory.DEFAULT_ROWSPEC,
-			FormFactory.RELATED_GAP_ROWSPEC,
-			FormFactory.DEFAULT_ROWSPEC,
-			FormFactory.RELATED_GAP_ROWSPEC,
-		}));
-		
-		JLabel optionsLabel = new JLabel(Lang.optionsLabel);
-
-		optionsPanel.add(optionsLabel, "2, 2");
-		
-		resolutionComboBox = new JComboBox<Resolution>();
-		resolutionComboBox.setModel(new DefaultComboBoxModel<Resolution>(Resolution.values()));
-		optionsPanel.add(resolutionComboBox, "2, 4");
-		
-		JButton optionsSaveButton = new JButton(Lang.saveButton);
-		optionsSaveButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				System.out.println("Saving options");
-				
-				Resolution res = (Resolution) resolutionComboBox.getSelectedItem();
-				frameWidth = res.getWidth();
-				
-				frameHeight = res.getHeight();
-				
-				mainFrame.setSize(frameWidth, frameHeight);
-				mainFrame.revalidate();
-				
-				GameOptions gameOptions = new GameOptions(frameWidth, frameHeight);
-				
-				fileManager.saveGameOptions(gameOptions);
-				removeOverlay();
-			}
-		});
-		optionsPanel.add(optionsSaveButton, "2, 14");
 	}
 	
 	public boolean initWarningsPanel() {
@@ -306,19 +265,7 @@ public class HeatDeathUI extends HeatDeath {
 			sb.append(Lang.warningShipOverloaded);
 		}
 		if(warning) {
-			warningPanel = new JPanel();
-			
-			JLabel warningLabel = new JLabel(sb.toString());
-			warningLabel.setForeground(Color.RED);
-			warningPanel.add(warningLabel);
-			
-			JButton closeWarningButton = new JButton(Lang.closeButton);
-			closeWarningButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					clearSinglePanel(UiZone.South);
-				}
-			});
-			warningPanel.add(closeWarningButton);
+			updateSinglePanel(UiZone.South, new NotificationPanel(sb.toString(), true, this));
 		}
 		return warning;
 	}
@@ -411,6 +358,8 @@ public class HeatDeathUI extends HeatDeath {
 		if(optionsList != null) {
 			for(Option opt : optionsList) {
 				OptionButton newButton = new OptionButton(opt.getName(), opt);
+				
+				//TODO this should be moved into option button
 				newButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						OptionButton sourceButton = (OptionButton) e.getSource();
@@ -421,9 +370,26 @@ public class HeatDeathUI extends HeatDeath {
 						
 						if(update != null) {
 							UpdateResult ur = update(update);
-							System.out.println(ur.getPur().getResult());
-							System.out.println(ur.getSur().getResult());
-							System.out.println(ur.getLur().getResult());
+							
+							PlayerUpdateResult pur = ur.getPur();
+							ShipUpdateResult sur = ur.getSur();
+							LocationUpdateResult lur = ur.getLur();
+							StringBuilder sb = new StringBuilder();
+							
+							if(pur != null) {
+								System.out.println(pur.getResult());
+								sb.append(pur.getResult());
+							}
+							if(sur != null) {
+								System.out.println(sur.getResult());
+								sb.append(sur.getResult());
+							}
+							if(lur != null) {
+								System.out.println(lur.getResult());
+								sb.append(lur.getResult());
+							}
+							//TODO this need the parent parameter, but gets cleared by the update function anyway
+							//updateSinglePanel(UiZone.South, new NotificationPanel(sb.toString(), false));
 						} else {
 							System.out.println("Update null");
 						}
@@ -438,9 +404,12 @@ public class HeatDeathUI extends HeatDeath {
 	
 	public UpdateResult update(Update update) {
 		UpdateResult ur = super.update(update);
-		initShipPanel();
+		
+		//TODO change this to an update rather than creating a new panel each time
+		shipPanel = new ShipPanel(this);
+		
 		initLocationOptionsPanel();
-		initLocationPanel();
+		locationPanel = new LocationPanel(current);
 		
 		Map<UiZone, JPanel> toDisplay = new HashMap<UiZone, JPanel>();
 		toDisplay.put(UiZone.West, locationOptionsPanel);
@@ -452,73 +421,13 @@ public class HeatDeathUI extends HeatDeath {
 		return ur;
 	}
 	
-	private void addStatusField(JPanel panel, String label, Integer value, Integer max) {
-		if(max != null) {
-			JLabel l = new JLabel(label + value + "/" + max);
-			panel.add(l);
-		} else {
-			JLabel l = new JLabel(label + value);
-			panel.add(l);
-		}
-
-	}
-	
-	public void initShipPanel() {
-		shipPanel = new JPanel();
-		shipPanel.setLayout(new GridLayout(0,1));
-		
-		JLabel playerNameLabel = new JLabel(player.getName());
-		shipPanel.add(playerNameLabel);
-		
-		addStatusField(shipPanel, Lang.playerEnergyLabel, player.getEnergy(), player.getMaxEnergy());
-		addStatusField(shipPanel, Lang.playerMoneyLabel, player.getMoney(), null);
-		
-		JLabel shipNameLabel = new JLabel(player.ship.getName());
-		shipPanel.add(shipNameLabel);
-		
-		addStatusField(shipPanel, Lang.shipHullLabel, player.ship.getHull(), player.ship.getMaxHull());
-		addStatusField(shipPanel, Lang.shipFuelLabel, player.ship.getFuel(), player.ship.getMaxFuel());
-		addStatusField(shipPanel, Lang.shipLoadLabel, player.ship.getLoad(), player.ship.getCapacity());
-		addStatusField(shipPanel, Lang.shipScrapLabel, player.ship.getScrap(), null);
-		addStatusField(shipPanel, Lang.shipEfficiencyLabel, player.ship.getEfficiency(), null);
-
-		JButton manageShipButton = new JButton(Lang.manageShipButton);
-		manageShipButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				initManageShipPanel();
-				updateSinglePanel(UiZone.East, manageShipPanel);
-			}
-		});
-		
-		shipPanel.add(manageShipButton);
-		
-		JButton manageCargoButton = new JButton(Lang.manageCargoButton);
-		manageCargoButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				initManageCargoPanel();
-				updateSinglePanel(UiZone.East, manageCargoPanel);
-			}
-		});
-		shipPanel.add(manageCargoButton);
-		
-		JButton manageUpgradesButton = new JButton(Lang.manageUpgradesButton);
-		manageUpgradesButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				initManageUpgradesPanel();
-				updateSinglePanel(UiZone.East, manageUpgradesPanel);
-			}
-		});
-		shipPanel.add(manageUpgradesButton);
-		
-		shipPanel.setVisible(true);
-	}
-	
 	public JButton createBackToShipPanelButton() {
 		JButton back = new JButton(Lang.backButton);
 		
+		shipPanel = new ShipPanel(this);
+		
 		back.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				initShipPanel();
 				updateSinglePanel(UiZone.East, shipPanel);
 			}
 		});
@@ -629,16 +538,6 @@ public class HeatDeathUI extends HeatDeath {
 		manageUpgradesPanel.add(testLabel);
 		
 		manageUpgradesPanel.add(createBackToShipPanelButton());
-	}
-	
-	public void initLocationPanel() {
-		locationPanel = new JPanel();
-		locationPanel.setLayout(new BorderLayout(0, 0));
-		
-		JTextArea locationTextArea = new JTextArea(current.toString());
-		locationTextArea.setLineWrap(true);
-
-		locationPanel.add(locationTextArea, BorderLayout.CENTER);
 	}
 	
 	public void clearSinglePanel(UiZone uiZone) {
@@ -857,11 +756,16 @@ public class HeatDeathUI extends HeatDeath {
 		}
 	}
 
-	public void setWorldSize(int worldSize) {
-		this.worldSize = worldSize;
-	}
-	
-	public void setWorldDensity(int worldDensity) {
-		this.worldDensity = worldDensity;
+	public void setFrameSize(int frameWidth, int frameHeight) {
+		this.frameWidth = frameWidth;
+		this.frameHeight = frameHeight;
+		
+		mainFrame.setSize(frameWidth, frameHeight);
+		mainFrame.revalidate();
+		
+		GameOptions gameOptions = new GameOptions(frameWidth, frameHeight);
+		
+		fileManager.saveGameOptions(gameOptions);
+		removeOverlay();
 	}
 }

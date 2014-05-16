@@ -1,4 +1,4 @@
-package ui;
+package uiElements;
 
 import javax.swing.JButton;
 

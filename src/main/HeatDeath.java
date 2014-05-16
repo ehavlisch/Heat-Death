@@ -637,4 +637,40 @@ public class HeatDeath {
 	public void setCurrentLocation(Location loc) {
 		current = loc;
 	}
+
+	public Location getCurrent() {
+		return current;
+	}
+
+	public Player getPlayer() {
+		return player;
+	}
+
+	public int getWorldSize() {
+		return worldSize;
+	}
+
+	public int getWorldDensity() {
+		return worldDensity;
+	}
+
+	public World getWorld() {
+		return world;
+	}
+
+	public Sector getSector() {
+		return sector;
+	}
+
+	public boolean isDebug() {
+		return debug;
+	}
+	
+	public void setWorldSize(int worldSize) {
+		this.worldSize = worldSize;
+	}
+	
+	public void setWorldDensity(int worldDensity) {
+		this.worldDensity = worldDensity;
+	}
 }
