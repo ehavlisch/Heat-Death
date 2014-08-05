@@ -1,5 +1,7 @@
 package main;
 
+import childrenLocations.Planet;
+
 public class Randomizer extends RNG {
 
 	public static String randomName() {
@@ -47,6 +49,61 @@ public class Randomizer extends RNG {
 
 		return name;
 	}
+	
+	public static void randomPlanet(Planet p) {
+		int size = random(990);
+		StringBuilder detailed = new StringBuilder("");
+		if(size < 3) {
+			p.setDesc("A mercurian planet.");
+			detailed.append(lowMassPlanetDetail[random(lowMassPlanetDetail.length)]);
+			detailed.append(" \n");
+			detailed.append(lowMassPlanetAtmosphere[random(lowMassPlanetAtmosphere.length)]);
+			detailed.append(" \n");
+			p.setDetailed(detailed.toString());
+		} else if(size < 10) {
+			p.setDesc("A subterran planet.");
+			detailed.append(lowMassPlanetDetail[random(lowMassPlanetDetail.length)]);
+			detailed.append(" \n");
+			detailed.append(lowMassPlanetAtmosphere[random(lowMassPlanetAtmosphere.length)]);
+			detailed.append(" \n");
+			p.setDetailed(detailed.toString());
+		} else if(size < 21) {
+			p.setDesc("A terran planet.");
+			detailed.append(medMassPlanetDetail[random(medMassPlanetDetail.length)]);
+			detailed.append(" \n");
+			detailed.append(medMassPlanetAtmosphere[random(medMassPlanetAtmosphere.length)]);
+			detailed.append(" \n");
+			p.setDetailed(detailed.toString());
+		} else if(size < 131) {
+			p.setDesc("A superterran planet.");
+			detailed.append(medMassPlanetDetail[random(medMassPlanetDetail.length)]);
+			detailed.append(" \n");
+			detailed.append(medMassPlanetAtmosphere[random(medMassPlanetAtmosphere.length)]);
+			detailed.append(" \n");
+			p.setDetailed(detailed.toString());
+		} else if(size < 279) {
+			p.setDesc("A neptunian planet.");
+			detailed.append(medMassPlanetDetail[random(medMassPlanetDetail.length)]);
+			detailed.append(" \n");
+			detailed.append(medMassPlanetAtmosphere[random(medMassPlanetAtmosphere.length)]);
+			detailed.append(" \n");
+			p.setDetailed(detailed.toString());
+		} else if(size < 980) {
+			p.setDesc("A jovian planet.");
+			detailed.append(highMassPlanetDetail[random(highMassPlanetDetail.length)]);
+			detailed.append(" \n");
+			detailed.append(highMassPlanetAtmosphere[random(highMassPlanetAtmosphere.length)]);
+			detailed.append(" \n");
+			p.setDetailed(detailed.toString());
+		} else {
+			p.setDesc("A planet that should be classified as a low-mass brown dwarf.");
+			detailed.append(highMassPlanetDetail[random(highMassPlanetDetail.length)]);
+			detailed.append(" \n");
+			detailed.append(highMassPlanetAtmosphere[random(highMassPlanetAtmosphere.length)]);
+			detailed.append(" \n");
+			p.setDetailed(detailed.toString());
+		}
+	}
 
 	private static String[] prefix = { 
 		"A-", "Anna", "Aw", 
@@ -88,8 +145,8 @@ public class Randomizer extends RNG {
 		"Ivy", "Indigo", "Ichor", "Ike", "Izzy", "Izzit", "Ira", "Io", "Ian", "Iava", "Iwan", "Itin", "Ivan", "Ivanov", "Itska", "Itchy", "Idra", "Ivy", "Iberron", "Illoria", "Ibo", 
 		"Jenkins", "Jam", "Jaspa", "Jasper", "Jank", "Jav", "Jay", "Jackson", "James", "Jac", "Jaque", "Jacue", "Jessie", "Jess", "Jessica", "Jelila", "Jel", "Jen", "Jei", "Jeb", "Jill", "Jiggy", "Jityr", "Jio", "Joline", "Jolina", "Joana", "Joan", "Jostalin", "Jost", "Justin", "Jurt", "Jurgens", "Juren", "Jurl", "Jurlaya", 
 		"Kongor", "Kang", "Kasper", "Karl", "Kaw", "Kav", "Kaven", "Ken", "Kent", "Kelly", "Kellen", "Kelins", "Kebbo", "Kebbin", "Kerbal", "Kinesia", "Kiness", "Kibble", "Krill", "Kabogan", "Krean", "Korea", "Kyoto", "Kyung", "King", "Knight", "Kool", "Kruel", "Krux", "Knox", "Knoxwell", "Kvorkian",
-		"Lance", 
-		"Maury", 
+		"Lance", "Lawrence", "Laren", "Larson", "Lanius", "Legate", "Legault", "Legolas", "Legion", "Lego", "Lee", "Lester", "Leven", "Levan", "Light", "Li", "Liral", "Lira", "Lici", "Lob", "Loki", "Looti", "Logan", "Lou", "Louise", "Lana", "Lam", "Lauralei", "Lefty", "Lingo", "Lop",
+		"Maury", "Maurice", "Maggie", "Mags", "Mat", "Matthew", "Matterhorn", "Marius", "Megan", "Meegan", "Megara", "Meshys", "Mesh", "Memnon", "Memoran", "Memory", "Missus", "Mistress", "Misty", "Maggie", "Mitch", "Mitchel", "Mitt", "Mutany", "Muthu", "Marbo", "Marb", "Musk", "Mow", "Mao", "Mu", "Mofat", "Mupen", "Moxy", "Moxie", "Moot",
 		"Nat", "Nature", "Ngata", "Nata", "Noo", "Noala", "Nean", "Neon", "Nequan", "Nava", "Nala", "Naan", "Na'an", "Nulia", "Nuzlef", "Ninnela", "Ni", "Night", "Nod", "Nodus", "Nodule", "Nobilus", "Nobintus", "Nabintan", "Nab-Nab", "Ninte", "Ninter", "Ning", "Nool", 
 		"Oogie", "Oana", "Oak", "Oave", "Obby", "Obsidian", "Obrella", "Obediah", "Occan", "Ocphen", "Oden", "Odin", "Odo", "Ody", "Oen", "Oflen", "Ogden", "Ogdon", "Ogren", "Ohvie", "Ohven", "Oit", "Oj", "Ojama", "Ojena", "Ophelia", "Oaken", "Oken", "Olaf", "Olen", "Ola", "Omon", "Omonie", "Onota", "Onis", "Onus", "Oogie", "Ooten", "Oppenheimer", "Opp", "Oqua", "Orphus", "Orus", "Oru", "Ora", "Oren", "Orilla", "O'Riley", "O'Roulee",
 		"Polly", 
@@ -106,33 +163,102 @@ public class Randomizer extends RNG {
 
 	private static String[] suffix = { 
 		"'a", "-a", "-aa", "al Assan", 
-		"bo", "ba", 
-		"co", "ca", 
-		"do", "da", 
-		"-eo", "'e", 
+		"bo", "ba", "bi", "be",
+		"co", "ca", "can",
+		"do", "da", "dan",
+		"-eo", "'e", "ean",
 		"fo", "fa", 
 		"go", "ga", 
 		"ho", "ha", 
-		"ia", 
-		"ja", 
+		"ia", "iba",
+		"ja", "jojo",
 		"ku", "-kenobi", 
-		"loa", 
-		"mu", 
-		"nu", 
-		"oop", 
-		"po", 
-		"'qoc", 
-		"ro", 
-		"sa", 
-		"to", 
-		"ua", 
-		"vo", 
-		"wan", 
-		"'xix", 
-		"ya", 
-		"zu", 
+		"loa", "lo",
+		"mu",  "ma",
+		"nu", "na",
+		"oop", "o",
+		"po", "pa",
+		"'qoc", "-qua",
+		"ro", "raro",
+		"sa", "san",
+		"to", "tan",
+		"ua", "u",
+		"vo", "vox",
+		"wan", "wa",
+		"'xix", "xiu",
+		"ya", "yin",
+		"zu", "zan",
 		" I", " II", " III", " IV", " V", " VI", " VII", " VIII", " IX", " X", " XI", " XII", " XIII", " XIV", " XV", " MMXIII", " MXII", " LXII", " LXI", " DCLVI", 
 		" One", " Two", " Three", " Fwe", " Four", " Five", " Six", " Seven", " Eight", " Nine", " Ten"
+	};
 
+	
+	private static String[] lowMassPlanetDetail = {
+		"A tiny rock floating in space.",
+		"A small lonely planet lost in space.",
+		"Top 3 smallest planets I have ever seen.",
+		"A small planet maybe .5 Old Earth Masses.",
+		"A small planet pocked with asteroid impacts.",
+		"A tiny planet with a good chunk, probably an asteroid or bad pilot.",
+		"A tiny planet with a large scorched piece missing, probably a weapons test. Need to test for radioactivity.",
+		"A 'planet' formed from two large asteroids that stuck.",
+		"A man made diamond planet. A natural phenomena or extravagant gift.",
+		"A small ball of mostly iron."
+	};
+	
+	private static String[] lowMassPlanetAtmosphere = {
+		"Typical subterran atmosphere. Thin frozen clouds of ammonia.",
+		"Very tenous and highy variable atmosphere containing hydrogen, helium, oxygen, and more.",
+		"Only a thin exosphere, definately not enough to human life.",
+		"Atmosphere contains mostly hydrogen. Very thin.",
+		"No atmosphere, probably closer to an asteroid.",
+		"No substantial atmosphere."
+	};
+	/*
+	 *  hypopsychroplanets < -50 C
+	 *  psychroplanets -50 - 0 C
+	 *  mesoplanets 0 - 50 C
+	 *  thermoplanets 50 - 100 C
+	 *  hyperthermoplanets 100 + C
+	 */
+	private static String[] medMassPlanetDetail = {
+		"An Old Earth-like planet that is uninhabited ... Highly radioactive.",
+		"A mesoplanet with dense clouds blocking the surface.",
+		"A decayed hypopsychroplanet that is showing large veins of ice.",
+		"A once hyperthermoplanet, now mostly just iron and obsidian.",
+		"A psychroplanet with small veins of iron and other useless.",
+		"A hypopsychroplanet you can see the cold from here."
+	};
+	
+	private static String[] medMassPlanetAtmosphere = {
+		"The atmosphere is dominated by sulfur and other volcanic gasses.",
+		"The atmosphere is rich in nitrogen and oxygen.",
+		"The atmosphere is dense with heavy gases.",
+		"Unable to get an atmosphere reading. Not sure why.",
+		"The atmosphere contains a highly infectious terminal virus.",
+		"The atmosphere is rich in nitrogen with clouds of ammonia.",
+		"The atmosphere is rich in helium that will explode on reentry."
+	};
+	
+	private static String[] highMassPlanetDetail = {
+		"An ice giant with great swirling ice storms ravaging the frozen surface.",
+		"A gas giant with blistering winds tearing deep valleys in the giant mountain chains.",
+		"A very large planet that may be a low mass brown dwarf rather than an actual planet.",
+		"A large planet with a thick cloud layer with remains of a civilization poking through.",
+		"A gas giant surrounded by a dyson ring. Wonder what happened to this one...",
+		"An ice giant that has grown so cold, the clouds have frozen solid like a giant marble.",
+		"A gas super giant with cloud patterns in a polka dot pattern. Heavy pollution centers likely.",
+		"A red and orange gas giant.",
+		"A red gas giant.",
+		"A blue and green gas giant.",
+		"An engineered gas giant that once had a rainbow pattern, doesn't look as nice anymore.",
+		"A gas giant with a lovevly vomit hue.",
+		"An ice giant with lime green tint.",
+		"An ice giant with an appropriate blue steel appearance."
+	};
+	
+	private static String[] highMassPlanetAtmosphere = {
+		"90% hydrogen 8% helium plus some other elements.",
+		"The atmosphere is a harsh mix of methane and ammonia."
 	};
 }

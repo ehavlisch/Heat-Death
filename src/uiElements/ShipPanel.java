@@ -6,12 +6,11 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JProgressBar;
 
 import player.Player;
-
 import ui.HeatDeathUI;
 import ui.UiZone;
-
 import main.Lang;
 
 @SuppressWarnings("serial")
@@ -71,9 +70,14 @@ public class ShipPanel extends ParentPanel {
 	}
 	
 	private void addStatusField(String label, Integer value, Integer max) {
+		JProgressBar progressBar = new JProgressBar();
+		
 		if(max != null) {
 			JLabel l = new JLabel(label + value + "/" + max);
 			this.add(l);
+			progressBar.setMaximum(max);
+			progressBar.setValue(value);
+			this.add(progressBar);
 		} else {
 			JLabel l = new JLabel(label + value);
 			this.add(l);
